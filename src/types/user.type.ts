@@ -22,3 +22,8 @@ export interface IFilterParams{
 export interface TypedRequestQuery<T> extends Express.Request {
     query: T;
 }
+
+export interface LoginRequest {
+	username: string
+	password: string
+}

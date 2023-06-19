@@ -1,25 +1,29 @@
-import bodyParser from 'body-parser';
-import express from 'express';
-import db from './models';
-import indexRouter from './routers';
 import * as dotenv from 'dotenv';
-
 dotenv.config();
+import db from './models';
+import logger from './loggers';
+import app from './app';
 
-const app = express();
+
 const port = process.env.PORT || 3003;
 
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(bodyParser.json());
-
-app.use('/api', indexRouter);
-
-db.sequelize.sync().then(() => {
-  app.listen(port, () => {
-    console.log(`Hello, Welcome to express!\nYou are on port: ${port}.`);
+function createHttpServer() {
+  const httpServer = db.sequelize.sync().then(() => {
+    app.listen(port, () => {
+      logger.info('Hello, Welcome to express!');
+      logger.info(`You are on port: ${port}.`);
+    });
   });
+  return httpServer;
+}
+createHttpServer();
+
+process.on('uncaughtException', (error: Error) => {
+  logger.error('uncaughtException: ', error);
 });
 
-// console.log('models: ', db.sequelize);
+process.on('unhandledRejection', (error: Error) => {
+  logger.error('unhandledRejection: ', error);
+});
 
+export default createHttpServer;

@@ -19,6 +19,21 @@ export default class UserService {
     return userRecords;
   }
 
+  static async queryUserByLogin(login: string) {
+    let user: User | null = null;
+    try {
+      user = await db.User.findOne({
+        where: {
+          [Op.and]: [{ login }, { isDeleted: false }]
+        },
+        raw: true
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    return user;
+  }
+
   static async queryUserByID(id: string) {
     let userRecords: Array<User> | null = null;
     try {
@@ -33,7 +48,7 @@ export default class UserService {
     return userRecords;
   }
 
-  static async queryUserByLogin(loginSubstring: string, limit: number) {
+  static async queryUsersByLogin(loginSubstring: string, limit: number) {
     let userRecords: Array<User> | null = null;
     try {
       userRecords = await db.User.findAll({
